@@ -94,6 +94,8 @@ public:
 	*/
 	virtual void Tick() {}
 
+	virtual void Tick2() {}
+
 	/*
 		Function: TickDefered
 			Called after all entities Tick() function has been called.

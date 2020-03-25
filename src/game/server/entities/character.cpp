@@ -751,6 +751,11 @@ void CCharacter::Tick()
 	m_PrevPos = m_Core.m_Pos;
 }
 
+void CCharacter::Tick2()
+{
+	m_Core.TickDeferred();
+}
+
 void CCharacter::TickDefered()
 {
 	// advance the dummy
@@ -759,6 +764,7 @@ void CCharacter::TickDefered()
 		m_ReckoningCore.Init(&TempWorld, GameServer()->Collision(), &((CGameControllerDDRace*)GameServer()->m_pController)->m_Teams.m_Core, &((CGameControllerDDRace*)GameServer()->m_pController)->m_TeleOuts);
 		m_ReckoningCore.m_Id = m_pPlayer->GetCID();
 		m_ReckoningCore.Tick(false);
+		m_ReckoningCore.TickDeferred();
 		m_ReckoningCore.Move();
 		m_ReckoningCore.Quantize();
 	}
