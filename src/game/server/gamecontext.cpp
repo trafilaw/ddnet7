@@ -737,7 +737,7 @@ void CGameContext::OnTick()
 
 				EndVote(VOTE_END_PASS, m_VoteEnforce==VOTE_ENFORCE_YES);
 			}
-			else if(m_VoteEnforce == VOTE_ENFORCE_NO || (m_VoteUpdate && No >= (Total+1)/2) || time_get() > m_VoteCloseTime)
+			else if(m_VoteEnforce == VOTE_ENFORCE_NO || (time_get() > m_VoteCloseTime && g_Config.m_SvVoteMajority))
 				EndVote(VOTE_END_FAIL, m_VoteEnforce==VOTE_ENFORCE_NO);
 			else if(m_VoteUpdate)
 			{
@@ -745,7 +745,14 @@ void CGameContext::OnTick()
 				SendVoteStatus(-1, Total, Yes, No);
 			}
 		}
+
+
+
 	}
+
+				if(time_get() > m_VoteCloseTime && !g_Config.m_SvVoteMajority)
+				m_VoteEnforce = (m_VoteWillPass && !Veto) ? VOTE_ENFORCE_YES : VOTE_ENFORCE_NO;
+
 
 	for (int i = 0; i < m_NumMutes; i++)
 	{
