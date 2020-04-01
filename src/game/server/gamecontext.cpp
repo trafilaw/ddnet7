@@ -751,7 +751,7 @@ void CGameContext::OnTick()
 	}
 
 				if(time_get() > m_VoteCloseTime && !g_Config.m_SvVoteMajority)
-				m_VoteEnforce = (m_VoteWillPass && !Veto) ? VOTE_ENFORCE_YES : VOTE_ENFORCE_NO;
+				m_VoteEnforce = (m_VoteWillPass) ? VOTE_ENFORCE_YES : VOTE_ENFORCE_NO;
 
 
 	for (int i = 0; i < m_NumMutes; i++)
