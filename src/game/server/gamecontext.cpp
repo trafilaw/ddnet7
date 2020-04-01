@@ -725,7 +725,12 @@ void CGameContext::OnTick()
 					else if(ActVote < 0)
 						No++;
 				}
+
+			
 			}
+
+			if(time_get() > m_VoteCloseTime && !g_Config.m_SvVoteMajority)
+				m_VoteEnforce = (m_VoteWillPass) ? VOTE_ENFORCE_YES : VOTE_ENFORCE_NO;
 
 			if(m_VoteEnforce == VOTE_ENFORCE_YES || (m_VoteUpdate && Yes >= Total/2+1))
 			{
@@ -750,8 +755,7 @@ void CGameContext::OnTick()
 
 	}
 
-				if(time_get() > m_VoteCloseTime && !g_Config.m_SvVoteMajority)
-				m_VoteEnforce = (m_VoteWillPass) ? VOTE_ENFORCE_YES : VOTE_ENFORCE_NO;
+			
 
 
 	for (int i = 0; i < m_NumMutes; i++)
