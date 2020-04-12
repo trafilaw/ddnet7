@@ -689,6 +689,7 @@ void CGameContext::OnTick()
 		else
 		{
 			int Total = 0, Yes = 0, No = 0;
+			bool Veto = false, VetoStop = false;
 			if(m_VoteUpdate)
 			{
 				// count votes
@@ -728,8 +729,32 @@ void CGameContext::OnTick()
 						Yes++;
 					else if(ActVote < 0)
 						No++;
+
+
+				// veto right for players who have been active on server for long and who're not afk
+					if(!m_VoteKick && !m_VoteSpec && m_apPlayers[i] &&
+						!m_apPlayers[i]->m_Afk && m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS &&
+						g_Config.m_SvVoteVetoTime &&
+						((Server()->Tick() - m_apPlayers[i]->m_JoinTick) / (Server()->TickSpeed() * 60) > g_Config.m_SvVoteVetoTime ||
+						 (m_apPlayers[i]->GetCharacter() && m_apPlayers[i]->GetCharacter()->m_DDRaceState == DDRACE_STARTED &&
+						 (Server()->Tick() - m_apPlayers[i]->GetCharacter()->m_StartTime) / (Server()->TickSpeed() * 60) > g_Config.m_SvVoteVetoTime)))
+					{
+						if(ActVote == 0)
+							Veto = true;
+						else if(ActVote < 0)
+							VetoStop = true;
+					}	
 				}
+
+				if((Yes > Total) && !Veto)
+					m_VoteEnforce = VOTE_ENFORCE_YES;
+
+				if(VetoStop)
+					m_VoteEnforce = VOTE_ENFORCE_NO;
 			}
+
+			if(time_get() > m_VoteCloseTime)
+				m_VoteEnforce = (m_VoteWillPass && !Veto) ? VOTE_ENFORCE_YES : VOTE_ENFORCE_NO;
 
 			if(m_VoteEnforce == VOTE_ENFORCE_YES || (m_VoteUpdate && Yes >= Total/2+1))
 			{
@@ -743,6 +768,10 @@ void CGameContext::OnTick()
 			}
 			else if(m_VoteEnforce == VOTE_ENFORCE_NO || (m_VoteUpdate && No >= (Total+1)/2) || time_get() > m_VoteCloseTime)
 				EndVote(VOTE_END_FAIL, m_VoteEnforce==VOTE_ENFORCE_NO);
+				if(VetoStop || (m_VoteWillPass && Veto))
+					SendChat(-1, CGameContext::CHAT_ALL, "Vote failed because of veto. Find an empty server instead");
+				else
+					SendChat(-1, CGameContext::CHAT_ALL, "Vote failed");
 			else if(m_VoteUpdate)
 			{
 				m_VoteUpdate = false;
