@@ -766,7 +766,7 @@ void CGameContext::OnTick()
 
 				EndVote(VOTE_END_PASS, m_VoteEnforce==VOTE_ENFORCE_YES);
 			}
-			else if(m_VoteEnforce == VOTE_ENFORCE_NO || (m_VoteUpdate && No >= (Total+1)/2) || time_get() > m_VoteCloseTime){
+			else if(m_VoteEnforce == VOTE_ENFORCE_NO || (m_VoteUpdate && No >= (Total+1)/2) || time_get() > m_VoteCloseTime)
 				EndVote(VOTE_END_FAIL, m_VoteEnforce==VOTE_ENFORCE_NO);
 				if(VetoStop || (m_VoteWillPass && Veto)){
 					char aBuf[128];
@@ -781,7 +781,6 @@ void CGameContext::OnTick()
 			{
 				m_VoteUpdate = false;
 				SendVoteStatus(-1, Total, Yes, No);
-			}
 			}
 		}
 	}
