@@ -771,11 +771,11 @@ void CGameContext::OnTick()
 				if(VetoStop || (m_VoteWillPass && Veto)){
 					char aBuf[128];
 					str_format(aBuf, sizeof(aBuf), "Vote failed because of veto. Find an empty server instead");
-					pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
+					SendChat(-1, CHAT_ALL, -1, aBuf);
 				} else {
 					char aBuf[128];
 					str_format(aBuf, sizeof(aBuf), "Vote failed");
-					pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
+					SendChat(-1, CHAT_ALL, -1, aBuf);
 				}
 			else if(m_VoteUpdate)
 			{
