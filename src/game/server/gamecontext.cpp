@@ -768,10 +768,13 @@ void CGameContext::OnTick()
 			}
 			else if(m_VoteEnforce == VOTE_ENFORCE_NO || (m_VoteUpdate && No >= (Total+1)/2) || time_get() > m_VoteCloseTime)
 				EndVote(VOTE_END_FAIL, m_VoteEnforce==VOTE_ENFORCE_NO);
-				if(VetoStop || (m_VoteWillPass && Veto))
-					SendChat(-1, CGameContext::CHAT_ALL, "Vote failed because of veto. Find an empty server instead");
-				else
-					SendChat(-1, CGameContext::CHAT_ALL, "Vote failed");
+				if(VetoStop || (m_VoteWillPass && Veto)){
+					str_format(aBuf, sizeof(aBuf), "Vote failed because of veto. Find an empty server instead");
+					pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
+				} else {
+					str_format(aBuf, sizeof(aBuf), "Vote failed");
+					pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
+				}
 			else if(m_VoteUpdate)
 			{
 				m_VoteUpdate = false;
