@@ -542,6 +542,9 @@ int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID)
 	CNetChunk Packet;
 	if(!pMsg)
 		return -1;
+	// drop invalid packet
+	if(ClientID != -1 && (ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State == CClient::STATE_EMPTY || m_aClients[ClientID].m_Quitting))
+		return 0;
 
 	mem_zero(&Packet, sizeof(CNetChunk));
 	Packet.m_ClientID = ClientID;
