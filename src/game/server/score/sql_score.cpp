@@ -392,7 +392,7 @@ bool CSqlScore::MapInfoThread(CSqlServer* pSqlServer, const CSqlData *pGameData,
 	{
 		char aBuf[1024];
 		str_format(aBuf, sizeof(aBuf),
-			"SELECT l.Map, l.Server, Mapper, Points, Stars, (select count(Name) from %s_race where Map = l.Map) as Finishes, (select count(distinct Name) from %s_race where Map = l.Map) as Finishers, (select round(avg(Time)) from %s_race where Map = l.Map) as Average, UNIX_TIMESTAMP(l.Timestamp) as Stamp, UNIX_TIMESTAMP(CURRENT_TIMESTAMP)-UNIX_TIMESTAMP(l.Timestamp) as Ago, (select min(Time) from %s_race where Map = l.Map and Name = '%s') as OwnTime FROM (SELECT * FROM %s_maps WHERE Map LIKE '%s' COLLATE utf8mb4_general_ci ORDER BY CASE WHEN Map = '%s' THEN 0 ELSE 1 END, CASE WHEN Map LIKE '%s%%' THEN 0 ELSE 1 END, LENGTH(Map), Map LIMIT 1) as l;",
+			"SELECT l.Map, l.Server, Mapper, Points, Stars, (select Name FROM %s_race WHERE Map = 1.Map ORDER BY Timestamp ASC LIMIT 1 ) AS firstFinish,(select count(Name) from %s_race where Map = l.Map) as Finishes, (select count(distinct Name) from %s_race where Map = l.Map) as Finishers, (select round(avg(Time)) from %s_race where Map = l.Map) as Average, UNIX_TIMESTAMP(l.Timestamp) as Stamp, UNIX_TIMESTAMP(CURRENT_TIMESTAMP)-UNIX_TIMESTAMP(l.Timestamp) as Ago, (select min(Time) from %s_race where Map = l.Map and Name = '%s') as OwnTime FROM (SELECT * FROM %s_maps WHERE Map LIKE '%s' COLLATE utf8mb4_general_ci ORDER BY CASE WHEN Map = '%s' THEN 0 ELSE 1 END, CASE WHEN Map LIKE '%s%%' THEN 0 ELSE 1 END, LENGTH(Map), Map LIMIT 1) as l;",
 			pSqlServer->GetPrefix(), pSqlServer->GetPrefix(), pSqlServer->GetPrefix(), pSqlServer->GetPrefix(), pData->m_Name.ClrStr(), pSqlServer->GetPrefix(), pData->m_aFuzzyMap, pData->m_RequestedMap.ClrStr(), pData->m_RequestedMap.ClrStr()
 		);
 		pSqlServer->executeSqlQuery(aBuf);
@@ -415,6 +415,8 @@ bool CSqlScore::MapInfoThread(CSqlServer* pSqlServer, const CSqlData *pGameData,
 			strcpy(aServer, pSqlServer->GetResults()->getString("Server").c_str());
 			char aMapper[128];
 			strcpy(aMapper, pSqlServer->GetResults()->getString("Mapper").c_str());
+			char afirstFinish[128];
+			strcpy(afirstFinish, pSqlServer->GetResults()->getString("firstFinish").c_str());
 			int stamp = pSqlServer->GetResults()->getInt("Stamp");
 			int ago = pSqlServer->GetResults()->getInt("Ago");
 			float ownTime = (float)pSqlServer->GetResults()->getDouble("OwnTime");
@@ -451,7 +453,7 @@ bool CSqlScore::MapInfoThread(CSqlServer* pSqlServer, const CSqlData *pGameData,
 				str_format(pOwnFinishesString, sizeof(pOwnFinishesString), ", your time: %02d:%05.2f", (int)(ownTime/60), ownTime-((int)ownTime/60*60));
 			}
 
-			str_format(aBuf, sizeof(aBuf), "\"%s\" by %s on %s, %s, %d %s%s, %d %s by %d %s%s%s", aMap, aMapper, aServer, aStars, points, points == 1 ? "point" : "points", pReleasedString, finishes, finishes == 1 ? "finish" : "finishes", finishers, finishers == 1 ? "tee" : "tees", pAverageString, pOwnFinishesString);
+			str_format(aBuf, sizeof(aBuf), "\"%s\" by %s on %s, %s, %d %s%s, %d  %d %s, First finish by %s", aMap, aMapper, aServer, aStars, points, points == 1 ? "point" : "points", pReleasedString, finishes, finishes == 1 ? "finish" : "finishes", finishers, finishers == 1 ? "tee" : "tees", afirstFinish);
 		}
 
 		pData->GameServer()->SendChatTarget(pData->m_ClientID, aBuf);
