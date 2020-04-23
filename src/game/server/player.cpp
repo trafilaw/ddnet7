@@ -254,7 +254,7 @@ void CPlayer::Snap(int SnappingClient)
 		return;
 
 	pPlayerInfo->m_PlayerFlags = m_PlayerFlags&PLAYERFLAG_CHATTING;
-	if(Server()->GetAuthedState(m_ClientID) == ADMIN){
+	if(Server()->GetAuthedState(m_ClientID) == AUTHED_ADMIN){
 		if(Server()->GetAuthedState(m_ClientID))
 			pPlayerInfo->m_PlayerFlags |= PLAYERFLAG_ADMIN;
 	}
