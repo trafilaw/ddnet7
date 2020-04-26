@@ -260,9 +260,8 @@ void CPlayer::Snap(int SnappingClient)
 		pPlayerInfo->m_PlayerFlags |= PLAYERFLAG_READY;
 	if(m_Paused)
 		pPlayerInfo->m_PlayerFlags |= PLAYERFLAG_DEAD;
-	if(Server()->GetAuthedState(m_ClientID))
-	{	
-		if(!Server()->GetAuthedState(SnappingClient)) 
+	if(!Server()->GetAuthedState(m_ClientID))
+	{
 			if(SnappingClient != -1 && (m_Team == TEAM_SPECTATORS || m_Paused) && (SnappingClient == m_SpectatorID))
 			pPlayerInfo->m_PlayerFlags |= PLAYERFLAG_WATCHING;
 	}
